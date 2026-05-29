@@ -1,60 +1,71 @@
-// ---------------------------------------------------------------------------
-// Susy Settings
+//////////////////////////////
+// Has Setting
+//////////////////////////////
+@function breakpoint-has($setting) {
+  @if map-has-key($breakpoint, $setting) {
+    @return true;
+  }
+  @else {
+    @return false;
+  }
+}
 
-// The total number of columns in the grid
-$total-columns      : 12              !default;
+//////////////////////////////
+// Get Settings
+//////////////////////////////
+@function breakpoint-get($setting) {
+  @if breakpoint-has($setting) {
+    @return map-get($breakpoint, $setting);
+  }
+  @else {
+    @return map-get($Breakpoint-Settings, $setting);
+  }
+}
 
-// The width of columns and gutters.
-// These must all be set with the comparable units.
-$column-width       : 4em             !default;
-$gutter-width       : 1em             !default;
+//////////////////////////////
+// Set Settings
+//////////////////////////////
+@function breakpoint-set($setting, $value) {
+  @if (str-index($setting, '-') or str-index($setting, '_')) and str-index($setting, ' ') == null {
+    @warn "Words in Breakpoint settings should be separated by spaces, not dashes or underscores. Please replace dashes and underscores between words with spaces. Settings will not work as expected until changed.";
+  }
+  $breakpoint: map-merge($breakpoint, ($setting: $value)) !global;
+  @return true;
+}
 
-// Padding on the left and right of a Grid Container.
-$grid-padding       : $gutter-width   !default;
+@mixin breakpoint-change($setting, $value) {
+  $breakpoint-change: breakpoint-set($setting, $value);
+}
 
-// ---------------------------------------------------------------------------
-// Advanced Settings
+@mixin breakpoint-set($setting, $value) {
+  @include breakpoint-change($setting, $value);
+}
 
-// From Direction:
-// Controls for right-to-left or bi-directional sites.
-$from-direction     : left            !default;
+@mixin bkpt-change($setting, $value) {
+  @include breakpoint-change($setting, $value);
+}
+@mixin bkpt-set($setting, $value) {
+  @include breakpoint-change($setting, $value);
+}
 
-// Omega Float Direction:
-// The direction that +omega elements are floated by deafult.
-$omega-float        : opposite-position($from-direction)    !default;
+//////////////////////////////
+// Remove Setting
+//////////////////////////////
+@function breakpoint-reset($settings...) {
+  @if length($settings) == 1 {
+    $settings: nth($settings, 1);
+  }
 
-// Container Width:
-// Override the total width of your grid, using any length (50em, 75%, etc.)
-$container-width    : false           !default;
+  @each $setting in $settings {
+    $breakpoint: map-remove($breakpoint, $setting) !global;
+  }
+  @return true;
+}
 
-// Container Style:
-// 'magic'  - Static (fixed or elastic) when there's enough space,
-//            fluid when there isn't. This is the SUSY MAGIC SAUCE(TM).
-// 'static' - Forces the grid container to remain static at all times.
-// 'fluid'  - Forces the grid to remain fluid at all times.
-//            (this will overrule any static $container-width settings)
-$container-style    : magic           !default;
+@mixin breakpoint-reset($settings...) {
+  $breakpoint-reset: breakpoint-reset($settings);
+}
 
-// Border-Box Sizing
-// Adjust the grid math appropriately for box-sizing: border-box;
-// Warning: This does not actually apply the new box model!
-// In most cases you can ignore this setting,
-// and simply apply the border-box-sizing mixin.
-$border-box-sizing  : false           !default;
-
-// Pixel Values only:
-// Make sure only pixel values are set for the container width.
-$pixel-values-only  : false           !default;
-
-// ---------------------------------------------------------------------------
-// IE Settings
-
-// When you are using a seperate IE stylesheet,
-// you can use these settings to control the output of at-breakpoint.
-// By default, at-breakpoint will output media-queries as well as
-// any defined ie-fallback classes.
-$breakpoint-media-output  : true      !default;
-$breakpoint-ie-output     : true      !default;
-
-// Danger Zone! Only set as 'true' in IE-specific style sheets.
-$breakpoint-raw-output    : false     !default;
+@mixin bkpt-reset($settings...) {
+  $breakpoint-reset: breakpoint-reset($settings);
+}
